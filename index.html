@@ -223,6 +223,7 @@
 
   <script>
     const allTasks = ["Skin Care", "Workout", "Dry Fruits", "Read 30 min"];
+    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxbrRfyqoj4Eq9wC4TR9SE_3kIdkZCkjnwBaAoYJlPMSBr-2C--BBSvRFDWzJDy4LWSpA/exec"; // <-- Replace this
 
     function formatDate(dateStr) {
       const date = new Date(dateStr);
@@ -248,7 +249,7 @@
     function saveProgress() {
       const user = document.getElementById('user').value;
       const congratsDiv = document.getElementById('congrats');
-      congratsDiv.style.display = "none"; // reset
+      congratsDiv.style.display = "none";
 
       if (!user) {
         alert("Please select a user");
@@ -258,7 +259,6 @@
       const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
       const selectedTasks = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
       const today = new Date().toISOString().slice(0, 10);
-
       const key = `${user}_${today}`;
       const data = {
         user,
@@ -266,11 +266,19 @@
         tasks: selectedTasks
       };
 
+      // Save to localStorage
       localStorage.setItem(key, JSON.stringify(data));
       document.getElementById('message').innerText = "✅ Today's progress saved!";
       loadEntries();
 
-      // 🎉 Check if all tasks completed
+      // Post to Google Sheets
+      fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      }).catch(err => console.error("Sheet POST error:", err));
+
+      // 🎉 Show Congrats
       if (selectedTasks.length === allTasks.length) {
         congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
         congratsDiv.style.display = "block";
@@ -287,7 +295,6 @@
     function loadEntries() {
       const entriesDiv = document.getElementById('entries');
       entriesDiv.innerHTML = '';
-
       const users = ['Nagaveni', 'Sharan'];
       const dataByDate = {};
 
@@ -302,7 +309,6 @@
       }
 
       const sortedDates = Object.keys(dataByDate).sort((a, b) => new Date(b) - new Date(a));
-
       if (sortedDates.length === 0) {
         entriesDiv.innerHTML = "<p>No entries found.</p>";
         return;
@@ -311,7 +317,6 @@
       sortedDates.forEach(date => {
         const dayBlock = document.createElement('div');
         dayBlock.className = 'day-block';
-
         const formattedDate = formatDate(date);
 
         const nagaveniData = dataByDate[date]['Nagaveni'] || { tasks: [] };
