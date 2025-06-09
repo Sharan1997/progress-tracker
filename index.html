@@ -7,6 +7,7 @@
   <style>
     * {
       transition: all 0.3s ease;
+      box-sizing: border-box;
     }
 
     body {
@@ -138,15 +139,12 @@
       justify-content: space-between;
       border-top: 1px solid #ccc;
       padding: 10px 0;
+      flex-wrap: wrap;
     }
 
     .entry-column {
       flex: 1;
       padding: 0 10px;
-    }
-
-    .task-status {
-      font-size: 14px;
     }
 
     .task-status span {
@@ -156,7 +154,6 @@
       border-radius: 20px;
       font-size: 14px;
       font-weight: bold;
-      background-color: #e0e0e0;
     }
 
     .done {
@@ -176,6 +173,7 @@
       margin-top: 20px;
       border-bottom: 1px solid #000;
       padding-bottom: 5px;
+      font-size: 18px;
     }
 
     .entry-column h4 {
@@ -189,6 +187,28 @@
       margin: 0 0 10px 0;
       border: 1px solid #b2dfdb;
       text-transform: uppercase;
+    }
+
+    .progress-bar-container {
+      background-color: #eee;
+      border-radius: 5px;
+      height: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: #4CAF50;
+      transition: width 0.4s ease-in-out;
+    }
+
+    .progress-label {
+      font-size: 13px;
+      text-align: right;
+      margin-bottom: 4px;
+      color: #555;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -220,10 +240,9 @@
     <div class="grid-view" id="entries"></div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAETAhm9M3TEyHt-Nfzm9LO1IuiuiNkoEE",
@@ -237,7 +256,12 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const allTasks = ["Skin Care", "Workout", "Dry Fruits", "Read 30 min"];
+    const allTasks = Array.from(document.querySelectorAll('.tasks input[type="checkbox"]')).map(cb => cb.value);
+
+    function getLocalDate() {
+      const now = new Date();
+      return now.toISOString().split('T')[0];
+    }
 
     function formatDate(dateStr) {
       const date = new Date(dateStr);
@@ -253,17 +277,7 @@
       })(day);
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const month = monthNames[date.getMonth()];
-      const year = date.getFullYear();
-      return `${day}${suffix} ${month} ${year}`;
-    }
-
-    function getLocalDate() {
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0');
-      const dd = String(now.getDate()).padStart(2, '0');
-      return `${yyyy}-${mm}-${dd}`;
+      return `${day}${suffix} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
     }
 
     function saveProgress() {
@@ -271,10 +285,7 @@
       const congratsDiv = document.getElementById('congrats');
       congratsDiv.style.display = "none";
 
-      if (!user) {
-        alert("Please select a user");
-        return;
-      }
+      if (!user) return alert("Please select a user");
 
       const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
       const selectedTasks = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
@@ -286,9 +297,7 @@
       document.getElementById('message').innerText = "✅ Today's progress saved!";
       loadEntries();
 
-      db.collection("progress").doc(key).set(data)
-        .then(() => console.log("Saved to Firebase"))
-        .catch(err => console.error("Firebase error:", err));
+      db.collection("progress").doc(key).set(data).catch(console.error);
 
       if (selectedTasks.length === allTasks.length) {
         congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
@@ -297,8 +306,7 @@
     }
 
     function clearCheckboxes() {
-      const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
-      checkboxes.forEach(cb => cb.checked = false);
+      document.querySelectorAll('.tasks input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.getElementById('message').innerText = "☑️ Selections cleared!";
       document.getElementById('congrats').style.display = "none";
     }
@@ -319,13 +327,7 @@
         }
       }
 
-      const sortedDates = Object.keys(dataByDate).sort((a, b) => new Date(b) - new Date(a));
-      if (sortedDates.length === 0) {
-        entriesDiv.innerHTML = "<p>No entries found.</p>";
-        return;
-      }
-
-      sortedDates.forEach(date => {
+      Object.keys(dataByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
         const dayBlock = document.createElement('div');
         dayBlock.className = 'day-block';
         const formattedDate = formatDate(date);
@@ -333,11 +335,21 @@
         const nagaveniData = dataByDate[date]['Nagaveni'] || { tasks: [] };
         const sharanData = dataByDate[date]['Sharan'] || { tasks: [] };
 
-        const renderTasks = (userData) => {
-          return allTasks.map(task => {
-            const done = userData.tasks.includes(task);
-            return `<span class="${done ? 'done' : 'not-done'}">${done ? '✔️' : '❌'} ${task}</span>`;
-          }).join("<br>");
+        const renderTasks = userData =>
+          allTasks.map(task =>
+            `<span class="${userData.tasks.includes(task) ? 'done' : 'not-done'}">
+              ${userData.tasks.includes(task) ? '✔️' : '❌'} ${task}
+            </span>`
+          ).join('<br>');
+
+        const renderProgress = userData => {
+          const percent = Math.round((userData.tasks.length / allTasks.length) * 100);
+          return `
+            <div class="progress-label">${percent}% Complete</div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+          `;
         };
 
         dayBlock.innerHTML = `
@@ -345,10 +357,12 @@
           <div class="entry-row">
             <div class="entry-column">
               <h4>Nagaveni</h4>
+              ${renderProgress(nagaveniData)}
               <div class="task-status">${renderTasks(nagaveniData)}</div>
             </div>
             <div class="entry-column">
               <h4>Sharan</h4>
+              ${renderProgress(sharanData)}
               <div class="task-status">${renderTasks(sharanData)}</div>
             </div>
           </div>
