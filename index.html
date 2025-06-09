@@ -5,210 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Daily Progress Tracker</title>
   <style>
-    * {
-      transition: all 0.3s ease;
-      box-sizing: border-box;
-    }
-
+    /* Your CSS styles remain unchanged */
+    * { transition: all 0.3s ease; box-sizing: border-box; }
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
+      font-family: Arial, sans-serif; margin: 0; padding: 20px;
       background: linear-gradient(to bottom right, #f0f4f8, #e8f5e9);
     }
-
     .container {
-      max-width: 700px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 700px; margin: auto; background: #fff;
+      padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
     h1 {
-      text-align: center;
-      font-size: 32px;
-      color: #2c3e50;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #4CAF50;
-      padding-bottom: 10px;
-      font-weight: 700;
+      text-align: center; font-size: 32px; color: #2c3e50;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 20px; border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px; font-weight: 700;
     }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    .tasks {
-      margin-top: 20px;
-    }
-
+    label { display: block; margin-top: 10px; }
+    .tasks { margin-top: 20px; }
     .tasks label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 16px;
+      display: flex; align-items: center;
+      margin-bottom: 10px; font-size: 16px;
     }
-
     input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      margin-right: 10px;
-      vertical-align: middle;
+      width: 18px; height: 18px; margin-right: 10px;
     }
-
-    .buttons {
-      margin-top: 20px;
-      text-align: center;
-    }
-
+    .buttons { margin-top: 20px; text-align: center; }
     .buttons button {
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      margin: 5px; padding: 10px 20px; font-size: 16px;
+      border: none; border-radius: 5px; cursor: pointer;
     }
-
     .buttons button:hover {
-      opacity: 0.9;
-      transform: scale(1.02);
+      opacity: 0.9; transform: scale(1.02);
     }
-
-    .save-btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .clear-btn {
-      background-color: #f44336;
-      color: white;
-    }
-
+    .save-btn { background-color: #4CAF50; color: white; }
+    .clear-btn { background-color: #f44336; color: white; }
     .message {
-      text-align: center;
-      margin-top: 10px;
-      color: green;
-      font-weight: bold;
+      text-align: center; margin-top: 10px;
+      color: green; font-weight: bold;
     }
-
     .congrats-message {
-      text-align: center;
-      color: #4CAF50;
-      font-size: 18px;
-      font-weight: bold;
-      margin-top: 10px;
+      text-align: center; color: #4CAF50;
+      font-size: 18px; font-weight: bold; margin-top: 10px;
     }
-
     select {
-      width: 60%;
-      padding: 8px;
-      font-size: 16px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      background-color: #fff;
+      width: 60%; padding: 8px; font-size: 16px; margin-top: 5px;
+      border: 1px solid #ccc; border-radius: 5px; background-color: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-
-    select:focus {
-      outline: none;
-      border-color: #4CAF50;
-    }
-
-    .grid-view {
-      margin-top: 30px;
-    }
-
+    select:focus { outline: none; border-color: #4CAF50; }
+    .grid-view { margin-top: 30px; }
     .day-block {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 15px;
-      margin-bottom: 20px;
+      background: #f9f9f9; border: 1px solid #ddd;
+      border-radius: 6px; padding: 15px; margin-bottom: 20px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
-
     .entry-row {
-      display: flex;
-      justify-content: space-between;
-      border-top: 1px solid #ccc;
-      padding: 10px 0;
+      display: flex; justify-content: space-between;
+      border-top: 1px solid #ccc; padding: 10px 0;
       flex-wrap: wrap;
     }
-
     .entry-column {
-      flex: 1;
-      padding: 0 10px;
+      flex: 1; padding: 0 10px;
     }
-
     .task-status span {
-      display: inline-block;
-      margin: 4px;
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: bold;
+      display: inline-block; margin: 4px; padding: 6px 10px;
+      border-radius: 20px; font-size: 14px; font-weight: bold;
     }
-
     .done {
-      background-color: #c8e6c9;
-      color: #1b5e20;
+      background-color: #c8e6c9; color: #1b5e20;
       border: 1px solid #a5d6a7;
     }
-
     .not-done {
-      background-color: #ffcdd2;
-      color: #b71c1c;
+      background-color: #ffcdd2; color: #b71c1c;
       border: 1px solid #ef9a9a;
     }
-
     .date-header {
-      font-weight: bold;
-      margin-top: 20px;
-      border-bottom: 1px solid #000;
-      padding-bottom: 5px;
+      font-weight: bold; margin-top: 20px;
+      border-bottom: 1px solid #000; padding-bottom: 5px;
       font-size: 18px;
     }
-
     .entry-column h4 {
-      background-color: #e0f7fa;
-      padding: 6px 10px;
-      border-radius: 4px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #00796b;
-      text-align: center;
-      margin: 0 0 10px 0;
-      border: 1px solid #b2dfdb;
-      text-transform: uppercase;
+      background-color: #e0f7fa; padding: 6px 10px;
+      border-radius: 4px; font-size: 16px; font-weight: bold;
+      color: #00796b; text-align: center; margin: 0 0 10px 0;
+      border: 1px solid #b2dfdb; text-transform: uppercase;
     }
-
     .progress-bar-container {
-      background-color: #eee;
-      border-radius: 5px;
-      height: 12px;
-      margin-bottom: 10px;
-      overflow: hidden;
+      background-color: #eee; border-radius: 5px;
+      height: 12px; margin-bottom: 10px; overflow: hidden;
     }
-
     .progress-bar {
-      height: 100%;
-      background-color: #4CAF50;
+      height: 100%; background-color: #4CAF50;
       transition: width 0.4s ease-in-out;
     }
-
     .progress-label {
-      font-size: 13px;
-      text-align: right;
-      margin-bottom: 4px;
-      color: #555;
-      font-weight: bold;
+      font-size: 13px; text-align: right;
+      margin-bottom: 4px; color: #555; font-weight: bold;
     }
   </style>
 </head>
@@ -217,7 +110,7 @@
     <h1>Daily Progress Tracker</h1>
 
     <label for="user">Select User:</label>
-    <select id="user">
+    <select id="user" onchange="bindTodayCheckboxes()">
       <option value="">-- Choose User --</option>
       <option value="Nagaveni">Nagaveni</option>
       <option value="Sharan">Sharan</option>
@@ -259,8 +152,8 @@
     const allTasks = Array.from(document.querySelectorAll('.tasks input[type="checkbox"]')).map(cb => cb.value);
 
     function getLocalDate() {
-      const now = new Date();
-      return now.toISOString().split('T')[0];
+      const offset = new Date().getTimezoneOffset() * 60000;
+      return new Date(Date.now() - offset).toISOString().split("T")[0];
     }
 
     function formatDate(dateStr) {
@@ -280,6 +173,26 @@
       return `${day}${suffix} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
     }
 
+    function bindTodayCheckboxes() {
+      const user = document.getElementById('user').value;
+      const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = false);
+      document.getElementById('message').innerText = '';
+      document.getElementById('congrats').style.display = "none";
+
+      if (!user) return;
+
+      const today = getLocalDate();
+      const key = `${user}_${today}`;
+      const entry = localStorage.getItem(key);
+      if (entry) {
+        const data = JSON.parse(entry);
+        checkboxes.forEach(cb => {
+          cb.checked = data.tasks.includes(cb.value);
+        });
+      }
+    }
+
     function saveProgress() {
       const user = document.getElementById('user').value;
       const congratsDiv = document.getElementById('congrats');
@@ -295,9 +208,8 @@
 
       localStorage.setItem(key, JSON.stringify(data));
       document.getElementById('message').innerText = "✅ Today's progress saved!";
-      loadEntries();
-
       db.collection("progress").doc(key).set(data).catch(console.error);
+      loadEntries();
 
       if (selectedTasks.length === allTasks.length) {
         congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
@@ -372,7 +284,10 @@
       });
     }
 
-    window.onload = loadEntries;
+    window.onload = () => {
+      loadEntries();
+      bindTodayCheckboxes();
+    };
   </script>
 </body>
 </html>
