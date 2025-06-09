@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Daily Progress Tracker</title>
   <style>
+    * {
+      transition: all 0.3s ease;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background: #f4f4f4;
+      background: linear-gradient(to bottom right, #f0f4f8, #e8f5e9);
     }
 
     .container {
@@ -21,49 +25,17 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-.day-block {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-.task-status span {
-  display: inline-block;
-  margin: 4px;
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
-  background-color: #e0e0e0;
-}
-
-.done {
-  background-color: #d4edda; /* light green background */
-  color: #2e7d32;            /* darker green text */
-  border: 1px solid #c3e6cb;
-}
-
-.not-done {
-  background-color: #f8d7da; /* light red background */
-  color: #c62828;            /* darker red text */
-  border: 1px solid #f5c6cb;
-}
-
-
-   h1 {
-  text-align: center;
-  font-size: 32px;
-  color: #2c3e50;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #4CAF50;
-  padding-bottom: 10px;
-  font-weight: 700;
-}
-
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      color: #2c3e50;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+      font-weight: 700;
+    }
 
     label {
       display: block;
@@ -75,8 +47,17 @@
     }
 
     .tasks label {
-      display: block;
-      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      vertical-align: middle;
     }
 
     .buttons {
@@ -91,6 +72,11 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+    }
+
+    .buttons button:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
     }
 
     .save-btn {
@@ -110,8 +96,41 @@
       font-weight: bold;
     }
 
+    .congrats-message {
+      text-align: center;
+      color: #4CAF50;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    select {
+      width: 60%;
+      padding: 8px;
+      font-size: 16px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #4CAF50;
+    }
+
     .grid-view {
       margin-top: 30px;
+    }
+
+    .day-block {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
     .entry-row {
@@ -130,12 +149,26 @@
       font-size: 14px;
     }
 
+    .task-status span {
+      display: inline-block;
+      margin: 4px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      background-color: #e0e0e0;
+    }
+
     .done {
-      color: green;
+      background-color: #c8e6c9;
+      color: #1b5e20;
+      border: 1px solid #a5d6a7;
     }
 
     .not-done {
-      color: red;
+      background-color: #ffcdd2;
+      color: #b71c1c;
+      border: 1px solid #ef9a9a;
     }
 
     .date-header {
@@ -145,54 +178,18 @@
       padding-bottom: 5px;
     }
 
-    .congrats-message {
-      text-align: center;
-      color: #4CAF50;
-      font-size: 18px;
+    .entry-column h4 {
+      background-color: #e0f7fa;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 16px;
       font-weight: bold;
-      margin-top: 10px;
+      color: #00796b;
+      text-align: center;
+      margin: 0 0 10px 0;
+      border: 1px solid #b2dfdb;
+      text-transform: uppercase;
     }
-
-select {
-  width: 60%;
-  padding: 8px;
-  font-size: 16px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-
-  .tasks label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-
-  input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    vertical-align: middle;
-  }
-
-.entry-column h4 {
-  background-color: #e0f7fa;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #00796b;
-  text-align: center;
-  margin: 0 0 10px 0;
-  border: 1px solid #b2dfdb;
-  text-transform: uppercase;
-}
-
-
-
-
   </style>
 </head>
 <body>
@@ -220,7 +217,6 @@ select {
 
     <div class="message" id="message"></div>
     <div class="congrats-message" id="congrats"></div>
-
     <div class="grid-view" id="entries"></div>
   </div>
 
