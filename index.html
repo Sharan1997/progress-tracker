@@ -191,6 +191,8 @@
 
       const today = getLocalDate();
       const key = `${user}_${today}`;
+
+      // Try localStorage first (optional)
       const entry = localStorage.getItem(key);
       if (entry) {
         const data = JSON.parse(entry);
@@ -198,7 +200,19 @@
           cb.checked = data.tasks.includes(cb.value);
         });
         document.getElementById('notes').value = data.note || '';
+        return;
       }
+
+      // Else load from Firestore
+      db.collection("progress").doc(key).get().then(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          checkboxes.forEach(cb => {
+            cb.checked = data.tasks.includes(cb.value);
+          });
+          document.getElementById('notes').value = data.note || '';
+        }
+      }).catch(console.error);
     }
 
     function saveProgress() {
@@ -215,15 +229,21 @@
       const key = `${user}_${today}`;
       const data = { user, date: today, tasks: selectedTasks, note };
 
+      // Save to localStorage (optional offline fallback)
       localStorage.setItem(key, JSON.stringify(data));
-      document.getElementById('message').innerText = "✅ Today's progress saved!";
-      db.collection("progress").doc(key).set(data).catch(console.error);
-      loadEntries();
 
-      if (selectedTasks.length === allTasks.length) {
-        congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
-        congratsDiv.style.display = "block";
-      }
+      // Save to Firestore
+      db.collection("progress").doc(key).set(data).then(() => {
+        document.getElementById('message').innerText = "✅ Today's progress saved!";
+        loadEntries();
+        if (selectedTasks.length === allTasks.length) {
+          congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
+          congratsDiv.style.display = "block";
+        }
+      }).catch(err => {
+        console.error("Firestore save error:", err);
+        document.getElementById('message').innerText = "❌ Error saving progress!";
+      });
     }
 
     function clearCheckboxes() {
@@ -233,79 +253,100 @@
       document.getElementById('congrats').style.display = "none";
     }
 
-    function loadEntries() {
+    async function loadEntries() {
       const entriesDiv = document.getElementById('entries');
       entriesDiv.innerHTML = '';
       const users = ['Nagaveni', 'Sharan'];
       const dataByDate = {};
 
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        const [user, date] = key.split('_');
-        if (users.includes(user)) {
-          const entry = JSON.parse(localStorage.getItem(key));
-          if (!dataByDate[date]) dataByDate[date] = {};
-          dataByDate[date][user] = entry;
-        }
+      try {
+        const snapshot = await db.collection("progress").get();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const user = data.user;
+          const date = data.date;
+          if (users.includes(user)) {
+            if (!dataByDate[date]) dataByDate[date] = {};
+            dataByDate[date][user] = data;
+          }
+        });
+
+        const renderTasks = userData =>
+          allTasks.map(task =>
+            `<span class="${userData.tasks.includes(task) ? 'done' : 'not-done'}">
+              ${userData.tasks.includes(task) ? '✔️' : '❌'} ${task}
+            </span>`
+          ).join('<br>');
+
+        const renderProgress = userData => {
+          const percent = Math.round((userData.tasks.length / allTasks.length) * 100);
+          return `
+            <div class="progress-label">${percent}% Complete</div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: ${percent}%;"></div>
+            </div>
+          `;
+        };
+
+        // Sort dates descending
+        const dates = Object.keys(dataByDate).sort((a,b) => new Date(b) - new Date(a));
+
+        dates.forEach(date => {
+          const dayBlock = document.createElement('div');
+          dayBlock.className = 'day-block';
+
+          const dateHeader = document.createElement('div');
+          dateHeader.className = 'date-header';
+          dateHeader.textContent = formatDate(date);
+          dayBlock.appendChild(dateHeader);
+
+          const entryRow = document.createElement('div');
+          entryRow.className = 'entry-row';
+
+          users.forEach(user => {
+            const userData = dataByDate[date][user];
+            const col = document.createElement('div');
+            col.className = 'entry-column';
+
+            const userTitle = document.createElement('h4');
+            userTitle.textContent = user;
+            col.appendChild(userTitle);
+
+            if (userData) {
+              const taskDiv = document.createElement('div');
+              taskDiv.className = 'task-status';
+              taskDiv.innerHTML = renderTasks(userData);
+              col.appendChild(taskDiv);
+
+              col.innerHTML += renderProgress(userData);
+
+              if (userData.note) {
+                const noteDiv = document.createElement('div');
+                noteDiv.style.marginTop = '6px';
+                noteDiv.style.fontStyle = 'italic';
+                noteDiv.style.color = '#555';
+                noteDiv.textContent = 'Note: ' + userData.note;
+                col.appendChild(noteDiv);
+              }
+            } else {
+              col.innerHTML += `<em>No data</em>`;
+            }
+
+            entryRow.appendChild(col);
+          });
+
+          dayBlock.appendChild(entryRow);
+          entriesDiv.appendChild(dayBlock);
+        });
+      } catch (error) {
+        console.error("Error loading entries:", error);
+        entriesDiv.innerHTML = '<p style="color:red; text-align:center;">Error loading progress data.</p>';
       }
-
-      const renderTasks = userData =>
-        allTasks.map(task =>
-          `<span class="${userData.tasks.includes(task) ? 'done' : 'not-done'}">
-            ${userData.tasks.includes(task) ? '✔️' : '❌'} ${task}
-          </span>`
-        ).join('<br>');
-
-      const renderProgress = userData => {
-        const percent = Math.round((userData.tasks.length / allTasks.length) * 100);
-        return `
-          <div class="progress-label">${percent}% Complete</div>
-          <div class="progress-bar-container">
-            <div class="progress-bar" style="width: ${percent}%;"></div>
-          </div>
-        `;
-      };
-
-      const renderNote = userData =>
-        userData.note ? `<div style="margin-top:10px; font-style:italic; color:#555;">📝 ${userData.note}</div>` : '';
-
-      Object.keys(dataByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
-        const dayBlock = document.createElement('div');
-        dayBlock.className = 'day-block';
-        const formattedDate = formatDate(date);
-
-        const nagaveniData = dataByDate[date]['Nagaveni'] || { tasks: [] };
-        const sharanData = dataByDate[date]['Sharan'] || { tasks: [] };
-
-        dayBlock.innerHTML = `
-          <div class="date-header">${formattedDate}</div>
-          <div class="entry-row">
-            <div class="entry-column">
-              <h4>👩 Nagaveni</h4>
-              ${renderProgress(nagaveniData)}
-              <div class="task-status">
-                ${renderTasks(nagaveniData)}
-                ${renderNote(nagaveniData)}
-              </div>
-            </div>
-            <div class="entry-column">
-              <h4>👨 Sharan</h4>
-              ${renderProgress(sharanData)}
-              <div class="task-status">
-                ${renderTasks(sharanData)}
-                ${renderNote(sharanData)}
-              </div>
-            </div>
-          </div>
-        `;
-        entriesDiv.appendChild(dayBlock);
-      });
     }
 
     window.onload = () => {
       loadEntries();
-      bindTodayCheckboxes();
-    };
+    }
   </script>
 </body>
 </html>
