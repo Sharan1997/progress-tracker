@@ -252,9 +252,10 @@ textarea {
   <div class="container">
     <h1>💑 Love Progress Tracker</h1>
 
-    <label for="user">Who's tracking today? 🥰</label>
+    <label for="user">Who's checking in today?
+ 🥰</label>
     <select id="user" onchange="bindTodayCheckboxes()">
-      <option value="">-- Choose User --</option>
+      <option value="">-- Select Partner --</option>
      <option value="Nagaveni">🌸 Nagaveni</option>
 <option value="Sharan">🧢 Sharan</option>
 
@@ -271,13 +272,13 @@ textarea {
 <label><input type="checkbox" value="Had Proper Sleep"> 😴 Had Proper Sleep</label><br>
 
 
-      <label for="notes" style="margin-top: 15px;">Optional Note:</label>
-      <textarea id="notes" rows="3" placeholder="Write a quick note or comment..."></textarea>
+      <label for="notes" style="margin-top: 15px;"> concern / Leave a Sweet Note to your partner 💌 </label>
+      <textarea id="notes" rows="3" placeholder="Write Something Caring, Thoughtful or cute..."></textarea>
     </div>
 
     <div class="buttons">
-      <button class="save-btn" onclick="saveProgress()">Save Progress</button>
-      <button class="clear-btn" onclick="clearCheckboxes()">Clear Response</button>
+      <button class="save-btn" onclick="saveProgress()">Save our day </button>
+      <button class="clear-btn" onclick="clearCheckboxes()">Reset </button>
     </div>
 
     <div class="message" id="message"></div>
