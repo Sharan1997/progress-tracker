@@ -6,181 +6,88 @@
   <title>Daily Progress Tracker</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #eef2f5;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
+      background: #f4f4f4;
     }
 
     .container {
-      max-width: 750px;
+      max-width: 700px;
       margin: auto;
       background: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    h1, h2 {
+    h1 {
       text-align: center;
-      color: #2c3e50;
     }
 
     label {
-      font-weight: bold;
       display: block;
-      margin: 15px 0 5px;
-      color: #34495e;
-    }
-
-    select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background-color: #fdfdfd;
-      font-size: 16px;
-      transition: border 0.3s ease;
-    }
-
-    select:focus {
-      border-color: #3498db;
-      outline: none;
+      margin-top: 10px;
     }
 
     .tasks {
-      margin: 15px 0;
+      margin-top: 20px;
     }
 
     .tasks label {
-      font-weight: normal;
-      color: #2d3436;
-      margin-bottom: 8px;
-    }
-
-    .tasks input {
-      margin-right: 8px;
+      display: block;
+      margin-bottom: 5px;
     }
 
     .buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      margin-top: 20px;
+      text-align: center;
     }
 
-    button {
-      padding: 12px 20px;
-      font-size: 15px;
+    .buttons button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
       border: none;
-      border-radius: 8px;
+      border-radius: 5px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
     .save-btn {
-      background-color: #2ecc71;
+      background-color: #4CAF50;
       color: white;
-    }
-
-    .save-btn:hover {
-      background-color: #27ae60;
     }
 
     .clear-btn {
-      background-color: #f39c12;
+      background-color: #f44336;
       color: white;
     }
 
-    .clear-btn:hover {
-      background-color: #d68910;
-    }
-
     .message {
-      margin-top: 15px;
-      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
       color: green;
-      text-align: center;
-    }
-
-    .congrats-message {
-      display: none;
-      text-align: center;
-      font-size: 24px;
       font-weight: bold;
-      color: #27ae60;
-      margin-top: 20px;
-      animation: pop 0.6s ease-in-out forwards;
-    }
-
-    @keyframes pop {
-      0% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
     }
 
     .grid-view {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    .day-block {
-      background: #f1f2f6;
-      padding: 20px;
-      border-radius: 10px;
-      border-left: 5px solid #2980b9;
-    }
-
-    .date-header {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-bottom: 15px;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 5px;
+      margin-top: 30px;
     }
 
     .entry-row {
       display: flex;
       justify-content: space-between;
-      gap: 20px;
-      flex-wrap: wrap;
+      border-top: 1px solid #ccc;
+      padding: 10px 0;
     }
 
     .entry-column {
       flex: 1;
-      min-width: 220px;
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    .entry-column h4 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      color: #34495e;
+      padding: 0 10px;
     }
 
     .task-status {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .task-status span {
-      background: white;
-      border-radius: 5px;
-      padding: 8px 12px;
       font-size: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     .done {
@@ -189,6 +96,21 @@
 
     .not-done {
       color: red;
+    }
+
+    .date-header {
+      font-weight: bold;
+      margin-top: 20px;
+      border-bottom: 1px solid #000;
+      padding-bottom: 5px;
+    }
+
+    .congrats-message {
+      text-align: center;
+      color: #4CAF50;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -221,9 +143,24 @@
     <div class="grid-view" id="entries"></div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAETAhm9M3TEyHt-Nfzm9LO1IuiuiNkoEE",
+      authDomain: "dailyprogresstracker-3e78d.firebaseapp.com",
+      projectId: "dailyprogresstracker-3e78d",
+      storageBucket: "dailyprogresstracker-3e78d.appspot.com",
+      messagingSenderId: "562711084610",
+      appId: "1:562711084610:web:2f99d09be9c35300b777db"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const allTasks = ["Skin Care", "Workout", "Dry Fruits", "Read 30 min"];
-    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzmFBzCPzad7WxbZEhDYEMaWczzlBGf7SJTQXu62iVtiucT1R82I8sFn1NH8xzEpcJr/exec"; // <-- Replace this
 
     function formatDate(dateStr) {
       const date = new Date(dateStr);
@@ -237,13 +174,19 @@
           default: return 'th';
         }
       })(day);
-
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const month = monthNames[date.getMonth()];
       const year = date.getFullYear();
-
       return `${day}${suffix} ${month} ${year}`;
+    }
+
+    function getLocalDate() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
     }
 
     function saveProgress() {
@@ -258,27 +201,18 @@
 
       const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
       const selectedTasks = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-      const today = new Date().toISOString().slice(0, 10);
+      const today = getLocalDate();
       const key = `${user}_${today}`;
-      const data = {
-        user,
-        date: today,
-        tasks: selectedTasks
-      };
+      const data = { user, date: today, tasks: selectedTasks };
 
-      // Save to localStorage
       localStorage.setItem(key, JSON.stringify(data));
       document.getElementById('message').innerText = "✅ Today's progress saved!";
       loadEntries();
 
-      // Post to Google Sheets
-      fetch(GOOGLE_SHEET_WEBHOOK_URL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      }).catch(err => console.error("Sheet POST error:", err));
+      db.collection("progress").doc(key).set(data)
+        .then(() => console.log("Saved to Firebase"))
+        .catch(err => console.error("Firebase error:", err));
 
-      // 🎉 Show Congrats
       if (selectedTasks.length === allTasks.length) {
         congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
         congratsDiv.style.display = "block";
@@ -326,7 +260,7 @@
           return allTasks.map(task => {
             const done = userData.tasks.includes(task);
             return `<span class="${done ? 'done' : 'not-done'}">${done ? '✔️' : '❌'} ${task}</span>`;
-          }).join("");
+          }).join("<br>");
         };
 
         dayBlock.innerHTML = `
