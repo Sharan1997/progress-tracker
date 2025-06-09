@@ -102,6 +102,27 @@
       text-align: center;
     }
 
+    .congrats-message {
+      display: none;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #27ae60;
+      margin-top: 20px;
+      animation: pop 0.6s ease-in-out forwards;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
     .grid-view {
       display: flex;
       flex-direction: column;
@@ -195,6 +216,7 @@
     </div>
 
     <div class="message" id="message"></div>
+    <div class="congrats-message" id="congrats"></div>
 
     <div class="grid-view" id="entries"></div>
   </div>
@@ -225,6 +247,9 @@
 
     function saveProgress() {
       const user = document.getElementById('user').value;
+      const congratsDiv = document.getElementById('congrats');
+      congratsDiv.style.display = "none"; // reset
+
       if (!user) {
         alert("Please select a user");
         return;
@@ -244,12 +269,19 @@
       localStorage.setItem(key, JSON.stringify(data));
       document.getElementById('message').innerText = "✅ Today's progress saved!";
       loadEntries();
+
+      // 🎉 Check if all tasks completed
+      if (selectedTasks.length === allTasks.length) {
+        congratsDiv.innerText = `🎉 Congratulations ${user}, you did it!`;
+        congratsDiv.style.display = "block";
+      }
     }
 
     function clearCheckboxes() {
       const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
       checkboxes.forEach(cb => cb.checked = false);
       document.getElementById('message').innerText = "☑️ Selections cleared!";
+      document.getElementById('congrats').style.display = "none";
     }
 
     function loadEntries() {
