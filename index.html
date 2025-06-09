@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Daily Progress Tracker</title>
   <style>
-    /* Your CSS styles remain unchanged */
+    /* Your existing styles remain unchanged, only the relevant additions are reflected */
     * { transition: all 0.3s ease; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif; margin: 0; padding: 20px;
@@ -51,9 +51,12 @@
     select {
       width: 60%; padding: 8px; font-size: 16px; margin-top: 5px;
       border: 1px solid #ccc; border-radius: 5px; background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    select:focus { outline: none; border-color: #4CAF50; }
+    textarea {
+      width: 100%; margin-top: 10px; padding: 10px;
+      border: 1px solid #ccc; border-radius: 5px;
+      font-size: 14px;
+    }
     .grid-view { margin-top: 30px; }
     .day-block {
       background: #f9f9f9; border: 1px solid #ddd;
@@ -112,8 +115,8 @@
     <label for="user">Select User:</label>
     <select id="user" onchange="bindTodayCheckboxes()">
       <option value="">-- Choose User --</option>
-      <option value="Nagaveni">Nagaveni</option>
-      <option value="Sharan">Sharan</option>
+      <option value="Nagaveni">👩 Nagaveni</option>
+      <option value="Sharan">👨 Sharan</option>
     </select>
 
     <div class="tasks">
@@ -121,6 +124,9 @@
       <label><input type="checkbox" value="Workout"> Workout</label>
       <label><input type="checkbox" value="Dry Fruits"> Dry Fruits</label>
       <label><input type="checkbox" value="Read 30 min"> Read 30 min</label>
+
+      <label for="notes" style="margin-top: 15px;">Optional Note:</label>
+      <textarea id="notes" rows="3" placeholder="Write a quick note or comment..."></textarea>
     </div>
 
     <div class="buttons">
@@ -179,6 +185,7 @@
       checkboxes.forEach(cb => cb.checked = false);
       document.getElementById('message').innerText = '';
       document.getElementById('congrats').style.display = "none";
+      document.getElementById('notes').value = '';
 
       if (!user) return;
 
@@ -190,6 +197,7 @@
         checkboxes.forEach(cb => {
           cb.checked = data.tasks.includes(cb.value);
         });
+        document.getElementById('notes').value = data.note || '';
       }
     }
 
@@ -202,9 +210,10 @@
 
       const checkboxes = document.querySelectorAll('.tasks input[type="checkbox"]');
       const selectedTasks = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+      const note = document.getElementById('notes').value.trim();
       const today = getLocalDate();
       const key = `${user}_${today}`;
-      const data = { user, date: today, tasks: selectedTasks };
+      const data = { user, date: today, tasks: selectedTasks, note };
 
       localStorage.setItem(key, JSON.stringify(data));
       document.getElementById('message').innerText = "✅ Today's progress saved!";
@@ -219,6 +228,7 @@
 
     function clearCheckboxes() {
       document.querySelectorAll('.tasks input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById('notes').value = '';
       document.getElementById('message').innerText = "☑️ Selections cleared!";
       document.getElementById('congrats').style.display = "none";
     }
@@ -239,6 +249,26 @@
         }
       }
 
+      const renderTasks = userData =>
+        allTasks.map(task =>
+          `<span class="${userData.tasks.includes(task) ? 'done' : 'not-done'}">
+            ${userData.tasks.includes(task) ? '✔️' : '❌'} ${task}
+          </span>`
+        ).join('<br>');
+
+      const renderProgress = userData => {
+        const percent = Math.round((userData.tasks.length / allTasks.length) * 100);
+        return `
+          <div class="progress-label">${percent}% Complete</div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" style="width: ${percent}%;"></div>
+          </div>
+        `;
+      };
+
+      const renderNote = userData =>
+        userData.note ? `<div style="margin-top:10px; font-style:italic; color:#555;">📝 ${userData.note}</div>` : '';
+
       Object.keys(dataByDate).sort((a, b) => new Date(b) - new Date(a)).forEach(date => {
         const dayBlock = document.createElement('div');
         dayBlock.className = 'day-block';
@@ -247,39 +277,27 @@
         const nagaveniData = dataByDate[date]['Nagaveni'] || { tasks: [] };
         const sharanData = dataByDate[date]['Sharan'] || { tasks: [] };
 
-        const renderTasks = userData =>
-          allTasks.map(task =>
-            `<span class="${userData.tasks.includes(task) ? 'done' : 'not-done'}">
-              ${userData.tasks.includes(task) ? '✔️' : '❌'} ${task}
-            </span>`
-          ).join('<br>');
-
-        const renderProgress = userData => {
-          const percent = Math.round((userData.tasks.length / allTasks.length) * 100);
-          return `
-            <div class="progress-label">${percent}% Complete</div>
-            <div class="progress-bar-container">
-              <div class="progress-bar" style="width: ${percent}%;"></div>
-            </div>
-          `;
-        };
-
         dayBlock.innerHTML = `
           <div class="date-header">${formattedDate}</div>
           <div class="entry-row">
             <div class="entry-column">
-              <h4>Nagaveni</h4>
+              <h4>👩 Nagaveni</h4>
               ${renderProgress(nagaveniData)}
-              <div class="task-status">${renderTasks(nagaveniData)}</div>
+              <div class="task-status">
+                ${renderTasks(nagaveniData)}
+                ${renderNote(nagaveniData)}
+              </div>
             </div>
             <div class="entry-column">
-              <h4>Sharan</h4>
+              <h4>👨 Sharan</h4>
               ${renderProgress(sharanData)}
-              <div class="task-status">${renderTasks(sharanData)}</div>
+              <div class="task-status">
+                ${renderTasks(sharanData)}
+                ${renderNote(sharanData)}
+              </div>
             </div>
           </div>
         `;
-
         entriesDiv.appendChild(dayBlock);
       });
     }
