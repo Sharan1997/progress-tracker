@@ -272,7 +272,7 @@ textarea {
 <label><input type="checkbox" value="Had Proper Sleep"> 😴 Had Proper Sleep</label><br>
 
 
-      <label for="notes" style="margin-top: 15px;"> Concern / Leave a Sweet Note to your partner 💌 </label>
+      <label for="notes" style="margin-top: 15px;"> concern / Leave a Sweet Note to your partner 💌 </label>
       <textarea id="notes" rows="3" placeholder="Write Something Caring, Thoughtful or cute..."></textarea>
     </div>
 
@@ -469,10 +469,12 @@ textarea {
 
               if (userData.note) {
                 const noteDiv = document.createElement('div');
-                noteDiv.style.marginTop = '6px';
+                noteDiv.style.marginTop = '12px';
+                noteDiv.style.marginBottom = '12px';
                 noteDiv.style.fontStyle = 'italic';
                 noteDiv.style.color = '#555';
-               noteDiv.textContent = '📝 ' + userData.note;
+                noteDiv.textContent = '📝 ' + userData.note;
+
                 col.appendChild(noteDiv);
               }
             } else {
