@@ -281,7 +281,7 @@
 <label><input type="checkbox" value="Night Turmeric Milk"> 🌙 Night Turmeric Milk</label><br>
 
 
-      <label for="notes" style="margin-top: 15px;">concern / Leave a Sweet Note to your partner 💌</label>
+      <label for="notes" style="margin-top: 15px;">Concern / Leave a Sweet Note to your partner 💌</label>
       <textarea id="notes" rows="3" placeholder="Write Something Caring, Thoughtful or cute..."></textarea>
     </div>
 
@@ -311,11 +311,22 @@
     const db = firebase.firestore();
 
 const allTasks = [
-  "Had Proper Sleep", "Cold Shower", "Morning Skin Care", "Have Dry Fruits",
-  "Drink 2-3 Liters of Water", "Drink Coconut Water", "Workout", "Learn Something New (30 mins)",
-  "Evening Face Wash", "No Sugar", "No Junk Food", "Brush Twice a Day",
-  "Morning Hot Lemon Water", "Night Turmeric Milk"
+  "Had Proper Sleep",
+  "Morning Hot Lemon Water",
+  "Cold Shower",
+  "Have Dry Fruits",
+  "Workout",
+  "Drink Coconut Water",
+  "Morning Skin Care",
+  "Learn Something New (30 mins)",
+  "Evening Face Wash",
+  "Drink 2-3 Liters of Water",
+  "No Sugar",
+  "No Junk Food",
+  "Brush Twice a Day",
+  "Night Turmeric Milk"
 ];
+
 
 
     function getLocalDate() {
