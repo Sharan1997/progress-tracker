@@ -415,7 +415,10 @@ const allTasks = [
     async function loadEntries() {
       const entriesDiv = document.getElementById('entries');
       entriesDiv.innerHTML = '';
-      const users = ['💃 Nagaveni ', '🕺 Sharan'];
+const users = [
+  { id: 'Nagaveni', label: '💃 Nagaveni' },
+  { id: 'Sharan', label: '🕺 Sharan' }
+];
       const dataByDate = {};
       const today = new Date();
       const past30Date = new Date();
@@ -439,11 +442,12 @@ const allTasks = [
           block.innerHTML = `<div class="date-header">${formatDate(date)}</div><div class="entry-row"></div>`;
           const row = block.querySelector('.entry-row');
 
-          users.forEach(user => {
-            const data = dataByDate[date][user];
-            const col = document.createElement('div');
-            col.className = 'entry-column';
-            col.innerHTML = `<h4>${user}</h4>`;
+          users.forEach(({ id, label }) => {
+  const data = dataByDate[date][id];
+  const col = document.createElement('div');
+  col.className = 'entry-column';
+  col.innerHTML = `<h4>${label}</h4>`;
+
             if (data) {
               const status = allTasks.map(task =>
                 `<span class="${data.tasks.includes(task) ? 'done' : 'not-done'}">
